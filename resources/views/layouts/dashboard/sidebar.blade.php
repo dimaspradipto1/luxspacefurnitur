@@ -10,7 +10,6 @@
             </a>
         </li>
 
-
         <li class="nav-heading">Data Produk</li>
         <li class="nav-item">
             <a class="nav-link {{ request()->routeIs('produk.*') ? '' : 'collapsed' }}" href="{{ route('produk.index') }}">
@@ -19,12 +18,14 @@
             </a>
         </li>
 
-        <li class="nav-item">
-            <a class="nav-link {{ request()->routeIs('product-gallery.*') ? '' : 'collapsed' }}" href="{{ route('product-gallery.index') }}">
-                <i class="bi bi-card-image"></i>
-                <span>Foto Produk</span>
-            </a>
-        </li>
+        @if(auth()->user()->roles === 'admin')
+            <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('product-gallery.*') ? '' : 'collapsed' }}" href="{{ route('product-gallery.index') }}">
+                    <i class="bi bi-card-image"></i>
+                    <span>Foto Produk</span>
+                </a>
+            </li>
+        @endif
 
         <li class="nav-heading">Data Transaksi</li>
         <li class="nav-item">
@@ -34,13 +35,15 @@
             </a>
         </li>
 
-        <li class="nav-heading">Data Pengguna</li>
-        <li class="nav-item">
-            <a class="nav-link {{ request()->routeIs('user.*') ? '' : 'collapsed' }}" href="{{ route('user.index') }}">
-                <i class="bi bi-people"></i>
-                <span>Pengguna</span>
-            </a>
-        </li>
+        @if(auth()->user()->roles === 'admin')
+            <li class="nav-heading">Data Pengguna</li>
+            <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('user.*') ? '' : 'collapsed' }}" href="{{ route('user.index') }}">
+                    <i class="bi bi-people"></i>
+                    <span>Pengguna</span>
+                </a>
+            </li>
+        @endif
 
     </ul>
 

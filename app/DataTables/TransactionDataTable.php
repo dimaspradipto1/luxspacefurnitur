@@ -20,16 +20,22 @@ class TransactionDataTable extends DataTable
         return (new EloquentDataTable($query))
             ->addIndexColumn()
             ->addColumn('action', function (Transaction $transaction) {
-                $edit   = route('transaction.edit', $transaction->id);
-                $delete = route('transaction.destroy', $transaction->id);
-                return '
-                    <a href="' . $edit . '" class="btn btn-sm btn-warning">edit</a>
-                    <form action="' . $delete . '" method="POST" style="display:inline;"
-                        onsubmit="return confirm(\'Yakin ingin menghapus transaksi ini?\')">
-                        <input type="hidden" name="_token" value="' . csrf_token() . '">
-                        <input type="hidden" name="_method" value="DELETE">
-                        <button type="submit" class="btn btn-sm btn-danger">delete</button>
-                    </form>';
+                $show = route('transaction.show', $transaction->id);
+                if (auth()->user()->roles === 'admin') {
+                    $edit   = route('transaction.edit', $transaction->id);
+                    $delete = route('transaction.destroy', $transaction->id);
+                    return '
+                        <a href="' . $show . '" class="btn btn-sm btn-info text-white me-1">show</a>
+                        <a href="' . $edit . '" class="btn btn-sm btn-warning me-1">edit</a>
+                        <form action="' . $delete . '" method="POST" style="display:inline;"
+                            onsubmit="return confirm(\'Yakin ingin menghapus transaksi ini?\')">
+                            <input type="hidden" name="_token" value="' . csrf_token() . '">
+                            <input type="hidden" name="_method" value="DELETE">
+                            <button type="submit" class="btn btn-sm btn-danger">delete</button>
+                        </form>';
+                } else {
+                    return '<a href="' . $show . '" class="btn btn-sm btn-info text-white">show</a>';
+                }
             })
             ->addColumn('harga_total', function (Transaction $transaction) {
                 return 'Rp ' . number_format($transaction->total_price, 0, ',', '.');
@@ -71,7 +77,7 @@ class TransactionDataTable extends DataTable
      */
     public function query(Transaction $model): QueryBuilder
     {
-        return $model->newQuery()->select([
+        $query = $model->newQuery()->select([
             'id',
             'users_id',
             'name',
@@ -82,6 +88,12 @@ class TransactionDataTable extends DataTable
             'status',
             'created_at'
         ]);
+
+        if (auth()->user()->roles !== 'admin') {
+            $query->where('users_id', auth()->id());
+        }
+
+        return $query;
     }
 
     /**

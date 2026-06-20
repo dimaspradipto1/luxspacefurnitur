@@ -25,6 +25,10 @@ class TransactionController extends Controller
      */
     public function create()
     {
+        if (auth()->user()->roles !== 'admin') {
+            abort(403, 'Unauthorized action.');
+        }
+
         $users    = User::orderBy('name', 'asc')->get();
         $products = Product::orderBy('name', 'asc')->get();
         return view('pages.transaction.create', compact('users', 'products'));
@@ -35,6 +39,10 @@ class TransactionController extends Controller
      */
     public function store(TransaksiRequest $request)
     {
+        if (auth()->user()->roles !== 'admin') {
+            abort(403, 'Unauthorized action.');
+        }
+
         $data = $request->validated();
         $products = $data['products_id'];
         unset($data['products_id']);
@@ -61,7 +69,13 @@ class TransactionController extends Controller
      */
     public function show(Transaction $transaction)
     {
-        abort(404);
+        if (auth()->user()->roles !== 'admin' && $transaction->users_id !== auth()->id()) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $transaction->load(['items.product.galleries', 'user']);
+
+        return view('pages.transaction.show', compact('transaction'));
     }
 
     /**
@@ -69,6 +83,10 @@ class TransactionController extends Controller
      */
     public function edit(Transaction $transaction)
     {
+        if (auth()->user()->roles !== 'admin') {
+            abort(403, 'Unauthorized action.');
+        }
+
         $users    = User::orderBy('name', 'asc')->get();
         $products = Product::orderBy('name', 'asc')->get();
         $transactionProducts = $transaction->items->pluck('products_id')->toArray();
@@ -81,6 +99,10 @@ class TransactionController extends Controller
      */
     public function update(TransaksiRequest $request, Transaction $transaction)
     {
+        if (auth()->user()->roles !== 'admin') {
+            abort(403, 'Unauthorized action.');
+        }
+
         $data = $request->validated();
         $products = $data['products_id'] ?? [];
         unset($data['products_id']);
@@ -110,6 +132,10 @@ class TransactionController extends Controller
      */
     public function destroy(Transaction $transaction)
     {
+        if (auth()->user()->roles !== 'admin') {
+            abort(403, 'Unauthorized action.');
+        }
+
         $transaction->delete();
 
         Alert::success('Berhasil', 'Transaksi berhasil dihapus.')

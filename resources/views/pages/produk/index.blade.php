@@ -18,9 +18,11 @@
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title">Data Produk</h5>
-                        <a href="{{ route('produk.create') }}" class="btn btn-success btn-sm px-3 mb-3">
-                            + Tambah
-                        </a>
+                        @if (auth()->user()->roles === 'admin')
+                            <a href="{{ route('produk.create') }}" class="btn btn-success btn-sm px-3 mb-3">
+                                + Tambah
+                            </a>
+                        @endif
                         <div class="table-responsive">
                             {{ $dataTable->table([
                                 'class' => 'table table-hover align-middle',

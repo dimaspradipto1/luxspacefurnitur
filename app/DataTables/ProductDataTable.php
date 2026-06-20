@@ -72,7 +72,7 @@ class ProductDataTable extends DataTable
      */
     public function getColumns(): array
     {
-        return [
+        $columns = [
             Column::computed('DT_RowIndex')
                   ->title('NO')
                   ->exportable(false)
@@ -82,13 +82,18 @@ class ProductDataTable extends DataTable
             Column::make('name')->title('NAMA PRODUK'),
             Column::computed('harga')->title('HARGA')->orderable(false)->searchable(false),
             Column::make('slug')->title('SLUG'),
-            Column::computed('action')
+        ];
+
+        if (auth()->check() && auth()->user()->roles === 'admin') {
+            $columns[] = Column::computed('action')
                   ->title('Action')
                   ->exportable(false)
                   ->printable(false)
                   ->width(130)
-                  ->addClass('text-center'),
-        ];
+                  ->addClass('text-center');
+        }
+
+        return $columns;
     }
 
     /**

@@ -22,8 +22,13 @@ Route::controller(AuthController::class)->group(function () {
 
 Route::middleware(['auth', 'checkrole'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::resource('produk', ProductController::class);
-    Route::resource('user', UserController::class);
-    Route::resource('product-gallery', ProductGalleryController::class)->except(['show']);
     Route::resource('transaction', TransactionController::class);
+
+    Route::get('/produk', [ProductController::class, 'index'])->name('produk.index');
+
+    Route::middleware(['admin'])->group(function () {
+        Route::resource('produk', ProductController::class)->except(['index']);
+        Route::resource('user', UserController::class);
+        Route::resource('product-gallery', ProductGalleryController::class)->except(['show']);
+    });
 });
