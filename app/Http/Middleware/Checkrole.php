@@ -14,11 +14,20 @@ class Checkrole
      *
      * @param  Closure(Request): (Response)  $next
      */
-    public function handle(Request $request, Closure $next): Response
+    public function handle(Request $request, Closure $next, ...$roles): Response
     {
-        if(Auth::user()->roles == 'admin' || Auth::user()->roles == 'user'){
+        if (empty($roles)) {
+            $roles = ['admin', 'user'];
+        }
+
+        if (Auth::check() && in_array(Auth::user()->roles, $roles)) {
             return $next($request);
         }
+
+        if (Auth::check() && (Auth::user()->roles === 'admin' || Auth::user()->roles === 'user')) {
+            abort(403, 'Unauthorized action.');
+        }
+
         Auth::logout();
         return redirect()->route('login');
     }
